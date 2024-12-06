@@ -4,7 +4,7 @@ CFLAGS = -Wall -Isrc/include
 LDFLAGS = 
 SRC_DIR = src
 BUILD_DIR = build
-EXECUTABLE = program
+EXECUTABLE = cli-wrapped
 
 # List of source files
 SRCS = $(wildcard $(SRC_DIR)/*.c)
