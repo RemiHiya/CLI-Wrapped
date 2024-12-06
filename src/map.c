@@ -10,6 +10,13 @@ map* map_create()
     return m;
 }
 
+void map_free(map* map)
+{
+    free(map->keys);
+    free(map->values);
+    free(map);
+}
+
 void map_set_size(map* map, int n)
 {
     map->keys = realloc(map->keys, n*sizeof(string));

@@ -11,6 +11,7 @@ typedef struct map
 } map;
 
 map* map_create();
+void map_free(map* map);
 void map_set_size(map* map, int n);
 void map_put(map* map, string key, int value);
 int map_get(map* map, string key);
