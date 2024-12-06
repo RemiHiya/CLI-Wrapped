@@ -17,6 +17,7 @@ void map_put(map* map, string key, int value);
 int map_get(map* map, string key);
 int map_is_entry(map* map, string key);
 void map_increment_value(map* map, string key);
+void map_display(map* map);
 
 
 #endif

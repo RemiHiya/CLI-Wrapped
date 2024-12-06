@@ -1,4 +1,5 @@
 #include "map.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -38,7 +39,8 @@ void map_put(map* map, string key, int value)
     } else
     {
         map_set_size(map, map->n+1);
-        map->keys[map->n-1] = key;
+        map->keys[map->n-1] = malloc(256*sizeof(char));
+        strcpy(map->keys[map->n-1], key);
         map->values[map->n-1] = value;
     }
 }
@@ -73,7 +75,15 @@ void map_increment_value(map* map, string key)
     } else
     {
         map_set_size(map, map->n+1);
-        map->keys[map->n-1] = key;
+        map->keys[map->n-1] = malloc(256*sizeof(char));
+        strcpy(map->keys[map->n-1], key);
         map->values[map->n-1] = 1;
+    }
+}
+
+void map_display(map* map)
+{
+    for (int i=0; i<map->n; i++) {
+        printf("%d: %s    ->   %d\n", i, map->keys[i], map->values[i]);
     }
 }
