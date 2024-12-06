@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "wrapper.h"
 
 
 int main(int argc, char const *argv[])
@@ -24,6 +25,7 @@ int main(int argc, char const *argv[])
     printf("User dir : %s\n", home);
     printf("Current shell : %s\n", shell);
 
+    wrap(shell, home);
     
     
 }
