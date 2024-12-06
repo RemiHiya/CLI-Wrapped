@@ -3,6 +3,8 @@
 #include <string.h>
 #include "wrapper.h"
 
+#define MIN(a,b) (((a)<(b))?(a):(b))
+
 void extract_words(const string in, char *a, char *b, char *c) {
     char copy[256];
     strncpy(copy, in, sizeof(copy));
@@ -135,6 +137,8 @@ void wrap(string shell, string home)
     map_display(cmd_map);
     
 
+    int display_amount = 5;
+    int num_top_cmd = (cmd) 
     /*int* top_commands = top_indices(cmd_map->values, cmd_map->n, 5);
     int* top_invocations = top_indices(ivk_map->values, ivk_map->n, 5);
     
