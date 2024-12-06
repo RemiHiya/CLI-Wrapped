@@ -34,7 +34,6 @@ void map_put(map* map, string key, int value)
         map->keys[map->n-1] = key;
         map->values[map->n-1] = value;
     }
-
 }
 
 int map_get(map* map, string key)
@@ -51,4 +50,23 @@ int map_is_entry(map* map, string key)
         if (strcmp(key, map->keys[i]) == 0) return 1;
     }
     return 0;
+}
+
+void map_increment_value(map* map, string key)
+{
+    if (map_is_entry(map, key))
+    {
+        for (int i=0; i<map->n; i++) {
+            if (strcmp(key, map->keys[i]) == 0)
+            {
+                map->values[i]++;
+                break;
+            }
+        }
+    } else
+    {
+        map_set_size(map, map->n+1);
+        map->keys[map->n-1] = key;
+        map->values[map->n-1] = 1;
+    }
 }
