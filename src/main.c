@@ -22,10 +22,13 @@ int main(int argc, char const *argv[])
         shell_name = shell;
     }
     shell = shell_name;
-    printf("User dir : %s\n", home);
-    printf("Current shell : %s\n", shell);
 
+    printf("\n");
+    printf("█▀▀ █░░ █   █░█░█ █▀█ ▄▀█ █▀█ █▀█ █▀▀ █▀▄\n");
+    printf("█▄▄ █▄▄ █   ▀▄▀▄▀ █▀▄ █▀█ █▀▀ █▀▀ ██▄ █▄▀\n");
+    printf("\n");
     wrap(shell, home);
+    printf("\n");
     
-    
+    return 0;
 }

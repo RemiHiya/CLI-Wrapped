@@ -4,6 +4,7 @@
 #include "wrapper.h"
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
 
 void extract_words(const string in, char *a, char *b, char *c) {
     char copy[256];
@@ -25,6 +26,9 @@ void extract_words(const string in, char *a, char *b, char *c) {
 
     token = strtok(copy, " ");
     while (token != NULL && count < 3) {
+        if (strncmp(token, "./", 2) == 0) {
+            break; // Stop the search if the word starts with "ab"
+        }
         // ignore sudo prefix
         if (count == 0 && strcmp(token, "sudo") == 0)
         {
@@ -56,9 +60,8 @@ int* top_indices(int *array, int size, int n) {
     }
 
     for (int i = 0; i < size; i++) {
-        int current = array[i];
         for (int j = 0; j < n; j++) {
-            if (result[j] == -1 || current > array[result[j]]) {
+            if (result[j] == -1 || array[i] > array[result[j]]) {
                 // Shift elems to the right
                 for (int k = n - 1; k > j; k--) {
                     result[k] = result[k - 1];
@@ -69,6 +72,7 @@ int* top_indices(int *array, int size, int n) {
             }
         }
     }
+    return result;
 }
 
 int wrap_bash(string home, map* cmd_map, map* ivk_map)
@@ -90,9 +94,8 @@ int wrap_bash(string home, map* cmd_map, map* ivk_map)
         char a[256], b[256], c[256];
         extract_words(line, a, b, c);
         map_increment_value(cmd_map, a);
-        map_increment_value(ivk_map, a);
-        map_increment_value(ivk_map, b);
-        map_increment_value(ivk_map, c);
+        if (strcmp(b, "")) map_increment_value(ivk_map, b);
+        if (strcmp(c, "")) map_increment_value(ivk_map, c);
         num++;
     }
 
@@ -101,12 +104,35 @@ int wrap_bash(string home, map* cmd_map, map* ivk_map)
     return num-1;
 }
 
-int wrap_zsh(string home)
+int wrap_zsh(string home, map* cmd_map, map* ivk_map)
 {
-    
+    string file = malloc(256*sizeof(char));
+    sprintf(file, "%s/.zsh_history", home);
+    int num = 0;
+
+    FILE* fd = fopen(file, "r");
+    if (fd == NULL)
+    {
+        fprintf(stderr, "Unable to open zsh history file.");
+        exit(1);
+    }
+
+    char line[256];
+    while (fgets(line, sizeof(line), fd))
+    {
+        char a[256], b[256], c[256];
+        extract_words(line+15, a, b, c);
+        if (strcmp(a, "")) map_increment_value(cmd_map, a);
+        if (strcmp(c, "")) map_increment_value(ivk_map, c);
+        num++;
+    }
+
+    fclose(fd);
+    free(file);
+    return num-1;
 }
 
-int wrap_fish(string home)
+int wrap_fish(string home, map* cmd_map, map* ivk_map)
 {
 
 }
@@ -118,11 +144,11 @@ void wrap(string shell, string home)
     int num;
     if (strcmp(shell, "zsh") == 0)
     {
-        num = wrap_zsh(home);
+        num = wrap_zsh(home, cmd_map, ivk_map);
     }
     else if (strcmp(shell, "fish") == 0)
     {
-        num = wrap_fish(home);
+        num = wrap_fish(home, cmd_map, ivk_map);
     }
     else if (strcmp(shell, "bash") == 0)
     {
@@ -133,27 +159,37 @@ void wrap(string shell, string home)
         fprintf(stderr, "No supported shell found.");
     }
 
-    num = wrap_bash(home, cmd_map, ivk_map);
-    map_display(cmd_map);
-    
-
     int display_amount = 5;
-    int num_top_cmd = (cmd) 
-    /*int* top_commands = top_indices(cmd_map->values, cmd_map->n, 5);
-    int* top_invocations = top_indices(ivk_map->values, ivk_map->n, 5);
+    int a = MIN(cmd_map->n, display_amount);
+    int b = MIN(ivk_map->n, display_amount);
+    int* top_commands = top_indices(cmd_map->values, cmd_map->n, a);
+    int* top_invocations = top_indices(ivk_map->values, ivk_map->n, b);
     
-    for (int i=0; i<5; i++) {
-        int tmp = top_commands[i];
-        printf("%d. %s\n", i, cmd_map->keys[tmp]);
+   
+    printf("%-20s   %-20s\n", "Top Commands", "Top Invocations");
+
+    for (int i = 0; i < MAX(a, b); i++) {
+        if (i < a) {
+            int tmp = top_commands[i];
+            printf("%d. %-20s", i+1, cmd_map->keys[tmp]);
+        } else {
+            printf("%-20s", ""); 
+        }
+
+        if (i < b) {
+            int tmp = top_invocations[i];
+            printf("%d. %-20s\n", i+1, ivk_map->keys[tmp]);
+        } else {
+            printf("\n"); 
+        }
     }
+
     printf("\n");
-    for (int i=0; i<5; i++) {
-        int tmp = top_invocations[i];
-        printf("%d. %s\n", i, ivk_map->keys[tmp]);
-    }
+    printf("Commands Ran\n");
+    printf("%d\n", num);
 
     free(top_commands);
-    free(top_invocations);*/
+    free(top_invocations);
     map_free(cmd_map);
     map_free(ivk_map);
 }
